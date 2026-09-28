@@ -1,0 +1,73 @@
+const express = require('express');
+const router = express.Router();
+
+// Mock database to store records in memory
+let students = [];
+
+// GET: Retrieve all students (Lab 2 - 4/4 verify)
+router.get('/', (req, res) => {
+    try {
+            res.status(200).json(students);
+                } catch (error) {
+                        res.status(500).json({ error: "Internal Server Error" });
+                            }
+                            });
+
+                            // POST: Create a new student record (Lab 2 - 2/4 & 4/4)
+                            router.post('/', (req, res) => {
+                                try {
+                                        const student = req.body;
+                                                
+                                                        if (!student || Object.keys(student).length === 0) {
+                                                                    return res.status(400).json({ error: "Bad Request: Data is required" });
+                                                                            }
+                                                                                    
+                                                                                            student.id = students.length > 0 ? students[students.length - 1].id + 1 : 1;
+                                                                                                    students.push(student);
+                                                                                                            
+                                                                                                                    res.status(201).json(student);
+                                                                                                                        } catch (error) {
+                                                                                                                                res.status(500).json({ error: "Internal Server Error" });
+                                                                                                                                    }
+                                                                                                                                    });
+
+                                                                                                                                    // PUT: Update an existing student record (Lab 2 - 2/4 & 4/4)
+                                                                                                                                    router.put('/:id', (req, res) => {
+                                                                                                                                        try {
+                                                                                                                                                const id = parseInt(req.params.id);
+                                                                                                                                                        const index = students.findIndex(s => s.id === id);
+                                                                                                                                                                
+                                                                                                                                                                        if (index === -1) {
+                                                                                                                                                                                    return res.status(404).json({ error: "Not Found: Unknown ID" });
+                                                                                                                                                                                            }
+                                                                                                                                                                                                    
+                                                                                                                                                                                                            if (!req.body || Object.keys(req.body).length === 0) {
+                                                                                                                                                                                                                        return res.status(400).json({ error: "Bad Request: Update data is required" });
+                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                students[index] = { ...students[index], ...req.body, id };
+                                                                                                                                                                                                                                                        res.status(200).json(students[index]);
+                                                                                                                                                                                                                                                            } catch (error) {
+                                                                                                                                                                                                                                                                    res.status(500).json({ error: "Internal Server Error" });
+                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                        });
+
+                                                                                                                                                                                                                                                                        // DELETE: Remove a student record (Lab 2 - 2/4 & 4/4)
+                                                                                                                                                                                                                                                                        router.delete('/:id', (req, res) => {
+                                                                                                                                                                                                                                                                            try {
+                                                                                                                                                                                                                                                                                    const id = parseInt(req.params.id);
+                                                                                                                                                                                                                                                                                            const index = students.findIndex(s => s.id === id);
+                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                            if (index === -1) {
+                                                                                                                                                                                                                                                                                                                        return res.status(404).json({ error: "Not Found: Unknown ID" });
+                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                students.splice(index, 1);
+                                                                                                                                                                                                                                                                                                                                                        res.status(200).json({ message: "Record deleted successfully" });
+                                                                                                                                                                                                                                                                                                                                                            } catch (error) {
+                                                                                                                                                                                                                                                                                                                                                                    res.status(500).json({ error: "Internal Server Error" });
+                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                        });
+
+                                                                                                                                                                                                                                                                                                                                                                        module.exports = router;
+                                                                                                                                                                                                                                                                                                                                                                        
